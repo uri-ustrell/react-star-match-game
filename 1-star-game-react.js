@@ -1,6 +1,9 @@
 // v1 STAR MATCH - Starting Template
 const PlayAgain = (props) => (
     <div className="game-done">
+      <div className="message" style={{color: props.status === 'lost' ? 'tomato' : 'lightgreen'}}>
+        {props.status === 'lost' ? 'Game Over' : 'You Win'}
+      </div>
       <button onClick={props.onClick} >
         Play Again!
       </button>
@@ -26,9 +29,25 @@ const PlayAgain = (props) => (
     const [stars, setStars] = useState(utils.random(1, 9));
     const [availableNums, setAvailableNums] = useState(utils.range(1, 9));
     const [candidateNums, setCandidateNums] = useState([]);
+    const [secondsLeft, setSecondsLeft] = useState(10);
+    
+    useEffect(() => {
+      if (secondsLeft > 0 && availableNums.length > 0) {
+        const timerId = setTimeout(() => {
+          setSecondsLeft(secondsLeft - 1);
+        }, 1000);
+        
+        return () => clearTimeout(timerId);
+      }
+    });
     
     const candidatesAreWrong = utils.sum(candidateNums) > stars;
-    const isGameDone = availableNums.length === 0;
+    const gameStatus = 
+      availableNums.length === 0
+        ? 'won'
+        : secondsLeft === 0
+          ? 'lost'
+          : 'active';
     
     const resetGame = () => {
       setStars(utils.random(1, 9));
@@ -48,7 +67,7 @@ const PlayAgain = (props) => (
     };
     
     const onNumberClick = (number, currentStatus) => {
-      if (currentStatus === 'used') {
+      if (currentStatus === 'used' || gameStatus !== 'active') {
         return;
       }
     
@@ -76,9 +95,9 @@ const PlayAgain = (props) => (
         <div className="body">
           <div className="left">
             {
-              isGameDone
-                ? <PlayAgain onClick={resetGame}/>
-                : <StarsDisplay count={stars} />
+              gameStatus === 'active'
+                ? <StarsDisplay count={stars} />
+                : <PlayAgain onClick={resetGame} status= {gameStatus} />
             }
           </div>
           <div className="right">
@@ -92,7 +111,7 @@ const PlayAgain = (props) => (
             )}
           </div>
         </div>
-        <div className="timer">Time Remaining: 10</div>
+        <div className="timer">Time Remaining: {secondsLeft}</div>
       </div>
     );
   };
