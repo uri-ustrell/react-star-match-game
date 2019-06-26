@@ -1,5 +1,12 @@
 // v1 STAR MATCH - Starting Template
-const StarsDisplay = (props) => (
+const PlayAgain = (props) => (
+    <div className="game-done">
+      <button onClick={props.onClick} >
+        Play Again!
+      </button>
+    </div>
+  );
+  const StarsDisplay = (props) => (
     <>
       {utils.range(1, props.count).map(starId =>
         <div key={starId} className="star" />
@@ -21,6 +28,13 @@ const StarsDisplay = (props) => (
     const [candidateNums, setCandidateNums] = useState([]);
     
     const candidatesAreWrong = utils.sum(candidateNums) > stars;
+    const isGameDone = availableNums.length === 0;
+    
+    const resetGame = () => {
+      setStars(utils.random(1, 9));
+      setAvailableNums(utils.range(1, 9));
+      setCandidateNums([]);
+    }
     
     const numberStatus = (number) => {
       if (!availableNums.includes(number)) {
@@ -61,7 +75,11 @@ const StarsDisplay = (props) => (
         </div>
         <div className="body">
           <div className="left">
-            <StarsDisplay count={stars} />
+            {
+              isGameDone
+                ? <PlayAgain onClick={resetGame}/>
+                : <StarsDisplay count={stars} />
+            }
           </div>
           <div className="right">
             {utils.range(1,9).map((num) =>
